@@ -1,0 +1,469 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ponto de Açúcar | Gestão e precificação para confeitaria</title>
+<meta name="description" content="Sistema para confeiteiras que vendem pelo WhatsApp: calcule o preço certo de cada receita, envie orçamentos e acompanhe pedidos pelo celular.">
+<meta property="og:title" content="Ponto de Açúcar | O preço certo de cada doce">
+<meta property="og:description" content="Calcule o preço das suas receitas, envie orçamentos pelo WhatsApp e organize pedidos e clientes. Funciona no celular.">
+<meta name="theme-color" content="#2b1714">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cacau:#2b1714;
+  --cacau-2:#4a2c26;
+  --glace:#f6cfda;
+  --glace-2:#fbe6ec;
+  --acucar:#fffafb;
+  --framboesa:#b0244f;
+  --framboesa-2:#8e1a3e;
+  --pistache:#8fb47d;
+  --linha:#ead3da;
+  --texto-2:#6e524c;
+  --display:"Bricolage Grotesque",system-ui,sans-serif;
+  --corpo:"Figtree",system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{background:var(--acucar);color:var(--cacau);font-family:var(--corpo);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+img{max-width:100%;display:block}
+a{color:var(--framboesa)}
+:focus-visible{outline:3px solid var(--framboesa);outline-offset:3px;border-radius:6px}
+.wrap{width:100%;max-width:1120px;margin:0 auto;padding:0 20px}
+
+/* barra */
+.topo{display:flex;align-items:center;justify-content:space-between;padding:18px 0}
+.marca{font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:-.02em;color:var(--cacau);text-decoration:none;display:flex;align-items:center;gap:10px}
+.marca svg{flex:none}
+.topo .btn{padding:10px 18px;font-size:15px}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;font-family:var(--corpo);font-weight:700;font-size:17px;padding:15px 26px;border-radius:999px;text-decoration:none;border:0;cursor:pointer;transition:background .15s}
+.btn-prim{background:var(--framboesa);color:#fff}
+.btn-prim:hover{background:var(--framboesa-2)}
+.btn-sec{background:transparent;color:var(--cacau);box-shadow:inset 0 0 0 2px var(--cacau)}
+.btn-sec:hover{background:var(--cacau);color:var(--acucar)}
+.btn svg{width:20px;height:20px;flex:none}
+
+/* hero */
+.hero{background:var(--glace);border-radius:0 0 48px 48px;padding-bottom:72px;overflow:hidden}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center;padding-top:40px}
+.hero h1{font-family:var(--display);font-weight:800;font-stretch:80%;font-size:clamp(44px,7vw,84px);line-height:.95;letter-spacing:-.035em;margin-bottom:24px}
+.hero .sub{font-size:19px;max-width:30em;color:var(--cacau-2);margin-bottom:32px}
+.hero .acoes{display:flex;flex-wrap:wrap;gap:12px}
+.hero .nota{margin-top:18px;font-size:14px;color:var(--texto-2)}
+
+/* ficha */
+.ficha{background:var(--acucar);border-radius:28px;padding:28px;box-shadow:0 30px 60px -30px rgba(43,23,20,.45);position:relative}
+.ficha-cab{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:18px}
+.ficha-cab h2{font-family:var(--display);font-weight:700;font-size:22px;letter-spacing:-.01em}
+.ficha-cab span{font-size:14px;color:var(--texto-2)}
+.custos{list-style:none;border-top:1px dashed var(--linha);margin-bottom:20px}
+.custos li{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px dashed var(--linha);font-size:15px}
+.custos li b{font-weight:600;font-variant-numeric:tabular-nums}
+.ajuste{margin-bottom:16px}
+.ajuste label{display:flex;justify-content:space-between;font-size:15px;font-weight:600;margin-bottom:6px}
+.ajuste output{font-variant-numeric:tabular-nums;color:var(--framboesa)}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:28px;background:transparent;cursor:pointer}
+input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:8px;background:var(--glace)}
+input[type=range]::-moz-range-track{height:8px;border-radius:8px;background:var(--glace)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;border-radius:50%;background:var(--framboesa);border:4px solid var(--acucar);box-shadow:0 0 0 1px var(--framboesa);margin-top:-9px}
+input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--framboesa);border:4px solid var(--acucar);box-shadow:0 0 0 1px var(--framboesa)}
+.resultado{background:var(--cacau);color:var(--acucar);border-radius:20px;padding:20px 22px;margin-top:6px}
+.resultado .linha1{display:flex;justify-content:space-between;align-items:flex-end;gap:12px}
+.resultado small{display:block;font-size:14px;opacity:.75}
+.preco{white-space:nowrap;font-family:var(--display);font-weight:800;font-stretch:80%;font-size:46px;line-height:1;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.fatia{text-align:right;font-size:15px;white-space:nowrap}
+.fatia strong{display:block;font-family:var(--display);font-size:24px;font-weight:700;font-variant-numeric:tabular-nums}
+.chute{margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,250,251,.18);font-size:15px}
+.chute strong{color:var(--glace)}
+
+/* seções */
+section{padding:96px 0}
+.titulo{font-family:var(--display);font-weight:800;font-stretch:85%;font-size:clamp(34px,5vw,56px);line-height:1;letter-spacing:-.03em;max-width:15em;margin-bottom:18px}
+.lead{font-size:19px;color:var(--texto-2);max-width:34em}
+
+/* dor */
+.dor{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start}
+.dor p{font-size:19px;color:var(--cacau-2);margin-bottom:16px;max-width:32em}
+.dor .citacao{font-family:var(--display);font-weight:700;font-size:clamp(26px,3.2vw,36px);line-height:1.15;letter-spacing:-.02em;border-left:6px solid var(--framboesa);padding-left:24px}
+
+/* funções */
+.funcoes{background:var(--glace-2)}
+.modulo{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center;padding:56px 0;border-top:2px solid var(--linha)}
+.modulo:first-of-type{margin-top:48px}
+.modulo h3{font-family:var(--display);font-weight:700;font-size:30px;line-height:1.1;letter-spacing:-.02em;margin-bottom:12px}
+.modulo p{color:var(--cacau-2);max-width:30em}
+.modulo ul{margin:16px 0 0 20px;color:var(--cacau-2)}
+.modulo ul li{margin-bottom:6px}
+
+/* mini telas */
+.tela{background:var(--acucar);border-radius:24px;padding:22px;box-shadow:0 20px 40px -28px rgba(43,23,20,.5)}
+.zap{background:#e7ddd4;border-radius:24px;padding:22px 18px}
+.balao{background:#d9fdd3;border-radius:14px 14px 4px 14px;padding:14px 16px 8px;max-width:92%;margin-left:auto;font-size:15px;line-height:1.5;color:#111b21;box-shadow:0 1px 1px rgba(0,0,0,.08)}
+.balao p{margin-bottom:8px}
+.balao .hora{text-align:right;font-size:12px;color:#667781;margin:0}
+.quadro{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.coluna{background:var(--glace-2);border-radius:14px;padding:10px}
+.coluna h4{font-size:13px;font-weight:700;margin-bottom:8px}
+.pedido{background:var(--acucar);border-radius:10px;padding:8px 10px;font-size:13px;line-height:1.35;margin-bottom:6px}
+.pedido span{display:block;color:var(--texto-2);font-size:12px}
+.st-pend h4{color:#9a5b00}
+.st-prod h4{color:#1d5fa8}
+.st-pronto h4{color:#3f7a2c}
+.st-entr h4{color:var(--texto-2)}
+.ing{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-bottom:1px dashed var(--linha);font-size:15px}
+.ing:last-child{border-bottom:0}
+.ing span{color:var(--texto-2);font-size:13px;display:block}
+.ing b{font-variant-numeric:tabular-nums;color:var(--framboesa);white-space:nowrap}
+.aniv{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.aniv span{background:#fdf0c9;color:#6b4300;border-radius:999px;padding:6px 14px;font-weight:600;font-size:14px}
+.cli{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px dashed var(--linha);font-size:15px}
+.cli em{font-style:normal;font-size:12px;font-weight:700;background:var(--glace-2);color:var(--framboesa-2);border-radius:999px;padding:3px 10px;white-space:nowrap}
+
+/* passos */
+.passos{display:grid;grid-template-columns:repeat(4,1fr);gap:28px;margin-top:48px;list-style:none;counter-reset:p}
+.passos li{counter-increment:p;position:relative;padding-top:68px}
+.passos li::before{content:counter(p);position:absolute;top:0;left:0;width:52px;height:52px;border-radius:50%;background:var(--glace);font-family:var(--display);font-weight:800;font-size:24px;display:flex;align-items:center;justify-content:center}
+.passos h3{font-family:var(--display);font-weight:700;font-size:21px;line-height:1.2;margin-bottom:8px}
+.passos p{color:var(--texto-2);font-size:16px}
+
+/* vantagens */
+.lista{display:grid;grid-template-columns:repeat(3,1fr);gap:40px 48px;margin-top:48px}
+.lista h3{font-family:var(--display);font-weight:700;font-size:21px;margin-bottom:6px}
+.lista p{color:var(--texto-2);font-size:16px}
+
+/* faq */
+.faq details{max-width:760px}
+.faq details{border-bottom:2px solid var(--linha)}
+.faq summary{list-style:none;cursor:pointer;padding:22px 44px 22px 0;font-family:var(--display);font-weight:700;font-size:21px;position:relative}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";position:absolute;right:4px;top:50%;transform:translateY(-50%);font-size:30px;font-weight:500;color:var(--framboesa);transition:transform .2s}
+.faq details[open] summary::after{transform:translateY(-50%) rotate(45deg)}
+.faq details p{padding:0 0 22px;color:var(--cacau-2);max-width:36em}
+
+/* final */
+.final{background:var(--cacau);color:var(--acucar);border-radius:48px 48px 0 0;text-align:center}
+.final .titulo{margin:0 auto 18px}
+.final .lead{color:#e9d6d1;margin:0 auto 36px}
+.final .btn-prim{background:var(--glace);color:var(--cacau)}
+.final .btn-prim:hover{background:#fff}
+.rodape{background:var(--cacau);color:#c9b2ac;font-size:14px;padding:28px 0 36px;border-top:1px solid rgba(255,250,251,.12)}
+.rodape .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px}
+
+/* entrada do hero */
+@media (prefers-reduced-motion:no-preference){
+  .ficha{animation:sobe .8s cubic-bezier(.2,.8,.2,1) .15s both}
+  @keyframes sobe{from{opacity:0;transform:translateY(40px) rotate(2deg)}to{opacity:1;transform:none}}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+@media (max-width:900px){
+  .hero-grid,.dor,.modulo{grid-template-columns:1fr;gap:36px}
+  .modulo .tela,.modulo .zap{order:2}
+  .passos{grid-template-columns:1fr 1fr}
+  .lista{grid-template-columns:1fr 1fr}
+  section{padding:72px 0}
+}
+@media (max-width:560px){
+  body{font-size:16px}
+  .wrap{padding:0 16px}
+  .topo .btn{display:none}
+  .hero{border-radius:0 0 32px 32px;padding-bottom:48px}
+  .hero-grid{padding-top:16px}
+  .hero .sub{font-size:17px}
+  .hero .acoes .btn{width:100%}
+  .ficha{padding:22px 18px;border-radius:22px}
+  .preco{font-size:34px}
+  .fatia strong{font-size:21px}
+  .passos,.lista{grid-template-columns:1fr}
+  .quadro{grid-template-columns:1fr 1fr}
+  .modulo{padding:44px 0}
+  .modulo h3{font-size:26px}
+  .final{border-radius:32px 32px 0 0}
+}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <nav class="topo" aria-label="Principal">
+      <a class="marca" href="#">
+        <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true"><path d="M5 15h24l-3 15H8z" fill="#b0244f"/><path d="M9 15v15M14 15v15M20 15v15M25 15v15" stroke="#f6cfda" stroke-width="1.5"/><circle cx="17" cy="10" r="7" fill="#2b1714"/><circle cx="14.5" cy="8" r="1.2" fill="#f6cfda"/><circle cx="19" cy="11" r="1.2" fill="#f6cfda"/><circle cx="18.5" cy="6.5" r="1" fill="#8fb47d"/></svg>
+        Ponto de Açúcar
+      </a>
+      <a class="btn btn-sec js-zap" href="#contato">Falar no WhatsApp</a>
+    </nav>
+
+    <div class="hero-grid">
+      <div>
+        <h1>Quanto custa, de verdade, o seu bolo?</h1>
+        <p class="sub">O Ponto de Açúcar calcula o preço de cada receita com ingredientes, gás, energia e as suas horas de trabalho. Depois manda o orçamento pronto no WhatsApp da cliente.</p>
+        <div class="acoes">
+          <a class="btn btn-prim js-zap" href="#contato">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.5 0-3-.4-4.3-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3c-.2.3-.9.9-.9 2.2s.9 2.5 1.1 2.7c.1.2 1.8 2.8 4.4 3.9 1.6.7 2.3.8 3.1.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.1-1.2l-.7-.4z"/></svg>
+            Quero conhecer o sistema
+          </a>
+          <a class="btn btn-sec" href="#funcoes">Ver o que ele faz</a>
+        </div>
+        <p class="nota">Funciona no navegador do celular e do computador. Não precisa instalar nada.</p>
+      </div>
+
+      <div class="ficha" aria-labelledby="ficha-titulo">
+        <div class="ficha-cab">
+          <h2 id="ficha-titulo">Bolo de brigadeiro</h2>
+          <span>rende 20 fatias</span>
+        </div>
+        <ul class="custos">
+          <li>Ingredientes <b>R$ 38,40</b></li>
+          <li>Gás <b>R$ 4,00</b></li>
+          <li>Energia <b>R$ 2,50</b></li>
+        </ul>
+        <div class="ajuste">
+          <label for="r-margem">Margem de lucro <output id="o-margem" for="r-margem">60%</output></label>
+          <input type="range" id="r-margem" min="20" max="150" step="5" value="60">
+        </div>
+        <div class="ajuste">
+          <label for="r-horas">Horas trabalhadas <output id="o-horas" for="r-horas">3 h</output></label>
+          <input type="range" id="r-horas" min="1" max="8" step="0.5" value="3">
+        </div>
+        <div class="ajuste">
+          <label for="r-valor">Valor da sua hora <output id="o-valor" for="r-valor">R$ 15</output></label>
+          <input type="range" id="r-valor" min="8" max="50" step="1" value="15">
+        </div>
+        <div class="resultado" aria-live="polite">
+          <div class="linha1">
+            <div><small>Preço de venda</small><div class="preco" id="v-preco">R$&nbsp;116,84</div></div>
+            <div class="fatia"><small>por fatia</small><strong id="v-fatia">R$&nbsp;5,84</strong></div>
+          </div>
+          <p class="chute" id="v-chute">Se você cobra <strong>R$ 80,00</strong> no chute, está deixando <strong>R$ 36,84</strong> na mesa a cada bolo.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section>
+    <div class="wrap dor">
+      <p class="citacao">Pegar o preço da vizinha e tirar dez reais não é precificar.</p>
+      <div>
+        <p>Muita confeiteira só percebe que trabalhou de graça no fim do mês. O leite condensado subiu, o botijão acabou mais cedo, a encomenda levou a tarde toda, e o preço continuou o mesmo.</p>
+        <p>O Ponto de Açúcar faz essa conta por você em cada receita, com o preço que você realmente pagou nos ingredientes. Quando um produto encarece, você atualiza uma vez e todas as receitas que usam ele mudam junto.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="funcoes" id="funcoes">
+    <div class="wrap">
+      <h2 class="titulo">A cozinha inteira organizada no celular</h2>
+      <p class="lead">Cinco telas simples, pensadas para quem atende sozinha e recebe encomenda pelo WhatsApp.</p>
+
+      <div class="modulo">
+        <div>
+          <h3>Ingredientes com custo real</h3>
+          <p>Cadastre o que você compra do jeito que vem no mercado: o preço da embalagem e quanto ela tem. O sistema calcula sozinho quanto custa cada grama, mililitro ou unidade.</p>
+          <ul>
+            <li>Gramas, quilos, mililitros, litros, unidades e xícaras</li>
+            <li>Busca rápida e lista em ordem alfabética</li>
+          </ul>
+        </div>
+        <div class="tela" aria-label="Exemplo da tela de ingredientes">
+          <div class="ing"><div>Leite condensado<span>embalagem de 395 g por R$ 7,90</span></div><b>R$ 0,020/g</b></div>
+          <div class="ing"><div>Chocolate 50% cacau<span>embalagem de 1 kg por R$ 52,00</span></div><b>R$ 0,052/g</b></div>
+          <div class="ing"><div>Creme de leite<span>embalagem de 200 g por R$ 3,60</span></div><b>R$ 0,018/g</b></div>
+          <div class="ing"><div>Ovos<span>bandeja com 30 un por R$ 21,00</span></div><b>R$ 0,70/un</b></div>
+        </div>
+      </div>
+
+      <div class="modulo">
+        <div>
+          <h3>Receitas que já saem com preço</h3>
+          <p>Monte a receita escolhendo os ingredientes e as quantidades. Some gás, energia e as horas que você gasta, defina a sua margem e veja o preço da receita inteira e de cada porção.</p>
+          <ul>
+            <li>Mão de obra entra separada, depois da margem, para o seu trabalho não sumir na conta</li>
+            <li>Bolos, docinhos, tortas, salgados e o que mais você fizer</li>
+          </ul>
+        </div>
+        <div class="tela" aria-label="Exemplo de cálculo de receita">
+          <div class="ing"><div>Custo dos ingredientes<span>leite condensado, chocolate, creme de leite, ovos</span></div><b>R$ 38,40</b></div>
+          <div class="ing"><div>Gás e energia</div><b>R$ 6,50</b></div>
+          <div class="ing"><div>Com margem de 60%</div><b>R$ 71,84</b></div>
+          <div class="ing"><div>Mão de obra<span>3 horas a R$ 15</span></div><b>R$ 45,00</b></div>
+          <div class="ing"><div><strong>Preço de venda</strong><span>20 fatias a R$ 5,84</span></div><b>R$ 116,84</b></div>
+        </div>
+      </div>
+
+      <div class="modulo">
+        <div>
+          <h3>Orçamento pronto no WhatsApp</h3>
+          <p>Escolha a cliente, adicione os itens e toque em enviar. O WhatsApp abre com a mensagem escrita, os valores calculados e a data de entrega. É só conferir e mandar.</p>
+        </div>
+        <div class="zap" aria-label="Exemplo de mensagem de orçamento no WhatsApp">
+          <div class="balao">
+            <p>Olá, Mariana!</p>
+            <p>Segue o orçamento que preparei para você:</p>
+            <p>Bolo de brigadeiro<br>1 x R$ 116,84 = R$ 116,84</p>
+            <p>Brigadeiro gourmet<br>50 x R$ 2,20 = R$ 110,00</p>
+            <p><strong>Total: R$ 226,84</strong><br>Entrega: 14/11</p>
+            <p class="hora">10:42</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="modulo">
+        <div>
+          <h3>Pedidos sem esquecer nenhum</h3>
+          <p>Cada encomenda tem cliente, produto, quantidade e data de entrega. Mude o status conforme a produção anda e veja na tela inicial as próximas entregas e quanto você já faturou.</p>
+        </div>
+        <div class="tela" aria-label="Exemplo do quadro de pedidos">
+          <div class="quadro">
+            <div class="coluna st-pend"><h4>Pendente</h4><div class="pedido">Bolo de ninho<span>sáb, 14/11</span></div><div class="pedido">Kit festa<span>dom, 15/11</span></div></div>
+            <div class="coluna st-prod"><h4>Produzindo</h4><div class="pedido">Torta de limão<span>sex, 13/11</span></div></div>
+            <div class="coluna st-pronto"><h4>Pronto</h4><div class="pedido">100 docinhos<span>sex, 13/11</span></div></div>
+            <div class="coluna st-entr"><h4>Entregue</h4><div class="pedido">Bolo de pote<span>qui, 12/11</span></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modulo">
+        <div>
+          <h3>Clientes que voltam</h3>
+          <p>Guarde WhatsApp, endereço, aniversário e observações de cada cliente, e marque quem é VIP, casamento, corporativo ou recorrente. Todo mês o sistema mostra quem faz aniversário, para você oferecer o bolo antes de outra pessoa.</p>
+        </div>
+        <div class="tela" aria-label="Exemplo da lista de clientes">
+          <div class="cli">Mariana Souza <em>Recorrente</em></div>
+          <div class="cli">Escritório Lima &amp; Costa <em>Corporativo</em></div>
+          <div class="cli">Patrícia e Diego <em>Casamento</em></div>
+          <p style="margin-top:16px;font-size:14px;font-weight:700;color:#6b4300">Aniversariantes deste mês</p>
+          <div class="aniv"><span>Mariana Souza</span><span>Dona Lúcia</span><span>Rafaela</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2 class="titulo">Do mercado à entrega em quatro passos</h2>
+      <ol class="passos">
+        <li><h3>Cadastre seus ingredientes</h3><p>Com o preço que você pagou na última compra.</p></li>
+        <li><h3>Monte suas receitas</h3><p>O preço de venda aparece na hora, inteiro e por porção.</p></li>
+        <li><h3>Envie o orçamento</h3><p>Direto para o WhatsApp da cliente, com tudo calculado.</p></li>
+        <li><h3>Acompanhe o pedido</h3><p>De pendente a entregue, com as datas sempre à vista.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <section style="padding-top:0">
+    <div class="wrap">
+      <h2 class="titulo">Feito para a rotina de quem confeita</h2>
+      <div class="lista">
+        <div><h3>Abre no celular</h3><p>Use no iPhone, no Android ou no computador, pelo navegador.</p></div>
+        <div><h3>Seus dados na nuvem</h3><p>Trocou de celular? É só entrar com seu e-mail e senha.</p></div>
+        <div><h3>Acesso com senha</h3><p>Só você vê seus clientes, receitas e pedidos.</p></div>
+        <div><h3>Sem planilha</h3><p>Nada de fórmula quebrada ou célula apagada sem querer.</p></div>
+        <div><h3>Com a sua marca</h3><p>O sistema leva o nome e as cores da sua confeitaria.</p></div>
+        <div><h3>Suporte de gente</h3><p>Dúvida? Você fala direto comigo pelo WhatsApp.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section style="padding-top:0">
+    <div class="wrap faq">
+      <h2 class="titulo">Perguntas frequentes</h2>
+      <details><summary>Preciso entender de computador?</summary><p>Não. Se você usa WhatsApp, consegue usar o Ponto de Açúcar. Eu ajudo a cadastrar os primeiros ingredientes e receitas com você.</p></details>
+      <details><summary>Tem que instalar algum aplicativo?</summary><p>Não. Ele abre pelo navegador, como um site. Você pode adicionar um atalho na tela inicial do celular para abrir com um toque.</p></details>
+      <details><summary>Serve para quem vende salgados também?</summary><p>Serve. Qualquer produto feito a partir de uma receita pode ser precificado: bolos, docinhos, tortas, salgados, marmitas e o que mais você vender.</p></details>
+      <details><summary>E se o preço de um ingrediente mudar?</summary><p>Você atualiza o preço do ingrediente uma vez e o custo de todas as receitas que usam ele é recalculado na hora.</p></details>
+      <details><summary>Meus dados ficam seguros?</summary><p>Ficam guardados em um banco de dados na nuvem e só podem ser acessados com o seu login. Ninguém mais vê seus clientes ou suas receitas.</p></details>
+    </div>
+  </section>
+
+  <section class="final" id="contato">
+    <div class="wrap">
+      <h2 class="titulo">Comece a cobrar o que o seu doce vale</h2>
+      <p class="lead">Me chame no WhatsApp para ver o sistema funcionando e montar o da sua confeitaria.</p>
+      <a class="btn btn-prim js-zap" href="#contato">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.5 0-3-.4-4.3-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3c-.2.3-.9.9-.9 2.2s.9 2.5 1.1 2.7c.1.2 1.8 2.8 4.4 3.9 1.6.7 2.3.8 3.1.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.1-1.2l-.7-.4z"/></svg>
+        Chamar no WhatsApp
+      </a>
+    </div>
+  </section>
+</main>
+
+<footer class="rodape">
+  <div class="wrap">
+    <span>Ponto de Açúcar, gestão e precificação para confeitaria</span>
+    <span>Site criado por Rafael Neiva</span>
+  </div>
+</footer>
+
+<script>
+// Numero do WhatsApp para contato (DDI + DDD + numero, so digitos). Ex.: '5577999999999'
+var WHATSAPP = '';
+var MSG_ZAP = 'Olá! Vi a página do Ponto de Açúcar e quero conhecer o sistema para a minha confeitaria.';
+
+(function () {
+  var links = document.querySelectorAll('.js-zap');
+  var url = 'https://wa.me/' + WHATSAPP + '?text=' + encodeURIComponent(MSG_ZAP);
+  for (var i = 0; i < links.length; i++) {
+    links[i].setAttribute('href', url);
+    links[i].setAttribute('target', '_blank');
+    links[i].setAttribute('rel', 'noopener');
+  }
+})();
+
+(function () {
+  var ING = 38.40, GAS = 4.00, NRG = 2.50, FATIAS = 20, CHUTE = 80;
+  var rM = document.getElementById('r-margem');
+  var rH = document.getElementById('r-horas');
+  var rV = document.getElementById('r-valor');
+  if (!rM || !rH || !rV) return;
+
+  function brl(n) {
+    var s = n.toFixed(2).split('.');
+    var inteiro = s[0];
+    var out = '';
+    while (inteiro.length > 3) {
+      out = '.' + inteiro.slice(-3) + out;
+      inteiro = inteiro.slice(0, -3);
+    }
+    return 'R$\u00a0' + inteiro + out + ',' + s[1];
+  }
+
+  function horas(h) {
+    var t = String(h).replace('.', ',');
+    return t + ' h';
+  }
+
+  function calc() {
+    var pm = parseFloat(rM.value);
+    var h = parseFloat(rH.value);
+    var vh = parseFloat(rV.value);
+    var base = ING + GAS + NRG;
+    var preco = base * (1 + pm / 100) + h * vh;
+    document.getElementById('o-margem').textContent = pm + '%';
+    document.getElementById('o-horas').textContent = horas(h);
+    document.getElementById('o-valor').textContent = 'R$\u00a0' + vh;
+    document.getElementById('v-preco').textContent = brl(preco);
+    document.getElementById('v-fatia').textContent = brl(preco / FATIAS);
+    var dif = preco - CHUTE;
+    var el = document.getElementById('v-chute');
+    if (dif > 0.005) {
+      el.innerHTML = 'Se voc&ecirc; cobra <strong>' + brl(CHUTE) + '</strong> no chute, est&aacute; deixando <strong>' + brl(dif) + '</strong> na mesa a cada bolo.';
+    } else {
+      el.innerHTML = 'Com essa conta, <strong>' + brl(CHUTE) + '</strong> j&aacute; cobre seus custos e o seu tempo.';
+    }
+  }
+
+  rM.addEventListener('input', calc);
+  rH.addEventListener('input', calc);
+  rV.addEventListener('input', calc);
+  calc();
+})();
+</script>
+</body>
+</html>
